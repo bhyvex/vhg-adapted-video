@@ -8,23 +8,51 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class FilterConfig {
 
-	private Collection<FileType> fileTypes=new HashSet<FileType>();
-	private Collection<HeaderFilter> headerFilters=new HashSet<HeaderFilter>();
-
-	public Collection<FileType> getFileTypes() {
-		return fileTypes;
+	private Collection<FileType> fileTypes = new HashSet<FileType>();
+	public Collection<HeaderFilter> getHeaderResponseFilters() {
+		return headerResponseFilters;
 	}
+
+
+	public void setHeaderResponseFilters(Collection<HeaderFilter> headerResponseFilters) {
+		this.headerResponseFilters = headerResponseFilters;
+	}
+
+
+	public Collection<HeaderFilter> getHeaderRequestFilters() {
+		return headerRequestFilters;
+	}
+
+
+	public void setHeaderRequestFilters(Collection<HeaderFilter> headerRequestFilters) {
+		this.headerRequestFilters = headerRequestFilters;
+	}
+
 
 	public void setFileTypes(Collection<FileType> fileTypes) {
 		this.fileTypes = fileTypes;
 	}
 
-	public Collection<HeaderFilter> getHeaderValues() {
-		return headerFilters;
+
+
+	private Collection<HeaderFilter> headerResponseFilters = new HashSet<HeaderFilter>();
+	private Collection<HeaderFilter> headerRequestFilters = new HashSet<HeaderFilter>();
+
+	public Collection<FileType> getFileTypes() {
+		return fileTypes;
 	}
 
-	public void setHeaderValues(Collection<HeaderFilter> headerValues) {
-		this.headerFilters = headerValues;
+	
+	public Collection<HeaderFilter> getHeaderResponseValues() {
+		return headerResponseFilters;
 	}
+
+	
+
+	public Collection<HeaderFilter> getHeaderRequestValues() {
+		return headerRequestFilters;
+	}
+
+	
 
 }

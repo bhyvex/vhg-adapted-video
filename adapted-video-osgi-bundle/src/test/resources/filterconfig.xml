@@ -1,0 +1,23 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><filterConfigWrapper>
+	<filterConfigs>
+	<fileTypes>
+		<extension>mp4</extension>
+		
+	</fileTypes>
+	<fileTypes>
+		<extension>mp3</extension>
+		
+	</fileTypes>
+	 <headerRequestFilters>
+      <header>Host</header>
+      <value>www.labri.fr</value>
+    </headerRequestFilters>
+    <headerResponseFilters>
+      <header>content-type</header>
+      <value>application/jpg</value>
+    </headerResponseFilters>
+
+</filterConfigs>
+
+	</filterConfigWrapper>

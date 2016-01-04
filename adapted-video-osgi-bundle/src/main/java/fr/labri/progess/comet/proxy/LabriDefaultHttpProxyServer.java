@@ -42,8 +42,7 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 		}
 
 		@Override
-		public HttpFilters filterRequest(HttpRequest originalRequest,
-				ChannelHandlerContext ctx) {
+		public HttpFilters filterRequest(HttpRequest originalRequest, ChannelHandlerContext ctx) {
 			return filterRequest(originalRequest);
 		}
 
@@ -59,8 +58,7 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 	}
 
 	private final class LabriHttpFiltersAdapter extends HttpFiltersAdapter {
-		private LabriHttpFiltersAdapter(HttpRequest originalRequest,
-				ChannelHandlerContext ctx) {
+		private LabriHttpFiltersAdapter(HttpRequest originalRequest, ChannelHandlerContext ctx) {
 			super(originalRequest, ctx);
 		}
 
@@ -72,16 +70,12 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 				HttpHeaders headers = fullreq.headers();
 				final String uri = this.originalRequest.getUri();
-				if (fullreq.getStatus().code() >= 200
-						&& fullreq.getStatus().code() < 300) {
-					if (checkForFilters(headers)
-							|| checkForFileExtension(this.originalRequest
-									.getUri())) {
-						LOGGER.debug("asked for cache for resource {}", uri);
+				if (fullreq.getStatus().code() >= 200 && fullreq.getStatus().code() < 300) {
+					if (checkForResponseFilters(headers) || checkForFileExtension(this.originalRequest.getUri())) {
+						LOGGER.debug("asked for cache for resource {} (response match)", uri);
 						cacheService.askForCache(this.originalRequest.getUri());
 					} else {
-						LOGGER.trace("resouce {} is NOT going to be cached",
-								uri);
+						LOGGER.trace("no file extension match, resouce {} is NOT going to be cached (response)", uri);
 					}
 				}
 
@@ -102,17 +96,32 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			return false;
 		}
 
-		private boolean checkForFilters(HttpHeaders headers) {
+		private boolean checkForResponseFilters(HttpHeaders headers) {
 			for (FilterConfig filterConfig : filterConfigs) {
 
-				for (HeaderFilter headerFilter : filterConfig.getHeaderValues()) {
+				for (HeaderFilter headerFilter : filterConfig.getHeaderResponseValues()) {
 
 					String headerValue = headers.get(headerFilter.getHeader());
-					if (headerValue != null
-							&& headerValue.toLowerCase().contains(
-									headerFilter.getValue().toLowerCase())
-							&& !content.containsKey(this.originalRequest
-									.getUri())) {
+					if (headerValue != null && headerValue.toLowerCase().contains(headerFilter.getValue().toLowerCase())
+							&& !content.containsKey(this.originalRequest.getUri())) {
+						return true;
+
+					}
+
+				}
+
+			}
+			return false;
+		}
+
+		private boolean checkForRequestFilters(HttpHeaders headers) {
+			for (FilterConfig filterConfig : filterConfigs) {
+
+				for (HeaderFilter headerFilter : filterConfig.getHeaderRequestValues()) {
+
+					String headerValue = headers.get(headerFilter.getHeader());
+					if (headerValue != null && (headerFilter.getValue() != null
+							&& headerValue.toLowerCase().contains(headerFilter.getValue().toLowerCase()))) {
 						return true;
 
 					}
@@ -126,38 +135,38 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			if (httpObject instanceof DefaultHttpRequest) {
 
 				DefaultHttpRequest fullreq = (DefaultHttpRequest) httpObject;
+
 				Content c = null;
 				// only return if content exist & at least one quality is
 				// available
-				if ((c = content.get(fullreq.getUri())) != null
-						&& c.getQualities().size() > 0) {
+				if ((c = content.get(fullreq.getUri())) != null && c.getQualities().size() > 0) {
 
 					LOGGER.debug("Cached resource found {}", c.getUri());
 
-					HttpResponse response = new DefaultHttpResponse(
-							HttpVersion.HTTP_1_1,
+					HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,
 							HttpResponseStatus.TEMPORARY_REDIRECT);
 					Collections.shuffle(c.getQualities());
 
 					String redirectUri = UriBuilder
-							.fromPath(
-									"http://" + config.getFrontalHostName()
-											+ ":" + config.getFrontalPort())
+							.fromPath("http://" + config.getFrontalHostName() + ":" + config.getFrontalPort())
 
-							.path("api").path("content").path(c.getId())
-							.path(c.getQualities().get(0)).build().toString();
+							.path("api").path("content").path(c.getId()).path(c.getQualities().get(0)).build()
+							.toString();
 					response.headers().add("Location", redirectUri);
 					LOGGER.debug("Redirecting it to ", redirectUri);
 					return response;
+				} else {
+					if (checkForRequestFilters(fullreq.headers())) {
+						LOGGER.debug("asked for cache for resource {} (request match)", fullreq.getUri());
+						cacheService.askForCache(this.originalRequest.getUri());
+					}
 				}
-
 			}
 			return null;
 		}
 	}
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(LabriDefaultHttpProxyServer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabriDefaultHttpProxyServer.class);
 	HttpProxyServer server;
 	final protected ConcurrentMap<String, Content> content;
 	final private CacheService cacheService;
@@ -184,19 +193,15 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 		return server.getListenAddress();
 	}
 
-	public LabriDefaultHttpProxyServer(LabriConfig config,
-			final ConcurrentMap<String, Content> content,
+	public LabriDefaultHttpProxyServer(LabriConfig config, final ConcurrentMap<String, Content> content,
 			final Set<FilterConfig> filterConfigs) {
 		this.content = content;
 		this.config = config;
 		this.filterConfigs = filterConfigs;
-		this.cacheService = new CacheService(this.config.getFrontalHostName(),
-				this.config.getFrontalPort());
+		this.cacheService = new CacheService(this.config.getFrontalHostName(), this.config.getFrontalPort());
 		LOGGER.debug("content is {}", this.content);
-		InetSocketAddress addr = new InetSocketAddress(
-				this.config.getHostName(), this.config.getPort());
-		server = DefaultHttpProxyServer.bootstrap().withAddress(addr)
-				.withFiltersSource(new LabriHttpFilterSource())
+		InetSocketAddress addr = new InetSocketAddress(this.config.getHostName(), this.config.getPort());
+		server = DefaultHttpProxyServer.bootstrap().withAddress(addr).withFiltersSource(new LabriHttpFilterSource())
 
 				.start();
 

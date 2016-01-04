@@ -21,12 +21,10 @@ public class CacheService {
 
 	void askForCache(String uri) {
 
-		WebTarget target = client.target("http://" + url + ":" + this.port)
-				.path("api").path("content");
+		WebTarget target = client.target("http://" + url + ":" + this.port).path("api").path("content");
 		Content content = new Content();
 		content.setUri(uri);
-		target.request().async()
-				.post(Entity.entity(content, MediaType.APPLICATION_XML));
+		target.request().async().post(Entity.entity(content, MediaType.APPLICATION_XML));
 	}
 
 }

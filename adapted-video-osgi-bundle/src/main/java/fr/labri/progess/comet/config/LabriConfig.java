@@ -15,6 +15,9 @@ public interface LabriConfig {
 	@Option(longName = "frontalPort", defaultValue = "8080")
 	Integer getFrontalPort();
 
+	@Option(longName = "debug", defaultValue = "false", description = "activates debug api")
+	boolean isDebug();
+
 	@Option(helpRequest = true)
 	boolean getHelp();
 }

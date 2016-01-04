@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class LabriConfigImpl implements LabriConfig {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(LabriConfigImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabriConfigImpl.class);
 	Properties props = new Properties();
 	private static final String CONFIG_FILE = "/var/local/labri/config.properties";
 
@@ -20,9 +19,7 @@ public class LabriConfigImpl implements LabriConfig {
 		try {
 			props.load(new FileReader(CONFIG_FILE));
 		} catch (IOException e) {
-			LOGGER.warn(
-					"failed to read config file {}, default values will be used",
-					CONFIG_FILE);
+			LOGGER.warn("failed to read config file {}, default values will be used", CONFIG_FILE);
 		}
 	}
 
@@ -48,8 +45,13 @@ public class LabriConfigImpl implements LabriConfig {
 
 	@Override
 	public boolean getHelp() {
-		throw new RuntimeException(
-				"that's a dummy method and should not be called");
+		throw new RuntimeException("that's a dummy method and should not be called");
+	}
+
+	@Override
+	public boolean isDebug() {
+
+		return false;
 	}
 
 }

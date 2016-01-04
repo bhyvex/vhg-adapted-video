@@ -29,7 +29,7 @@ public class ConfigurationEndpoint {
 		HeaderFilter headerValue = new HeaderFilter();
 		headerValue.setHeader("Content-Type");
 		headerValue.setValue("video/mp4");
-		config.getHeaderValues().add(headerValue);
+		config.getHeaderResponseValues().add(headerValue);
 
 		wrapper.getFilterConfigs().add(config);
 
