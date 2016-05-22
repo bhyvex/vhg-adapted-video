@@ -15,11 +15,16 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Content {
 
 	String uri;
-
+	
+	/**
+	 * if a target URI is specified, proxy should return to this one, and not resolve the url to the frontend
+	 */
+	String targetUri;
 	String id;
 	Date created;
 	Boolean cached;
 	List<String> qualities = new ArrayList<String>();
+	
 
 	public List<String> getQualities() {
 		return qualities;
@@ -59,6 +64,14 @@ public class Content {
 
 	public void setCreated(Date created) {
 		this.created = created;
+	}
+	
+	public String getTargetUri() {
+		return targetUri;
+	}
+
+	public void setTargetUri(String targetUri) {
+		this.targetUri = targetUri;
 	}
 
 }

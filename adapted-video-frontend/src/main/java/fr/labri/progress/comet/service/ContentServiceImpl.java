@@ -51,6 +51,7 @@ public class ContentServiceImpl implements ContentService {
 		URI contentUri;
 		try {
 			contentUri = new URI(content.getUri());
+			
 			if (contentUri.toString()
 					.contains(CliConfSingleton.streamerBaseURL)) {
 				LOGGER.debug("Streamer delivered video are not cached");

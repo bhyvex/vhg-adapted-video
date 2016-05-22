@@ -16,14 +16,14 @@ import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progess.comet.model.FilterConfig;
 import fr.labri.progess.comet.model.FilterConfigWrapper;
 
-@Path("/op/")
+@Path("op")
 public class ConfigOperationRS {
 
 	@Inject
 	Context context;
 
 	@Produces(MediaType.APPLICATION_XML)
-	@Path("/config")
+	@Path("config")
 	@GET
 
 	public FilterConfigWrapper getAllConfig() {
@@ -59,7 +59,7 @@ public class ConfigOperationRS {
 	}
 
 	@Produces(MediaType.APPLICATION_XML)
-	@Path("/content")
+	@Path("content")
 	@GET
 
 	public ContentWrapper getAllContents() {
@@ -68,7 +68,7 @@ public class ConfigOperationRS {
 	}
 
 	@Consumes(MediaType.APPLICATION_XML)
-	@Path("/config")
+	@Path("config")
 	@PUT
 	public Response addFilterConfig(FilterConfigWrapper configs) {
 
@@ -79,7 +79,7 @@ public class ConfigOperationRS {
 	}
 
 	@Consumes(MediaType.APPLICATION_XML)
-	@Path("/content")
+	@Path("content")
 	@PUT
 	public Response addContents(ContentWrapper contents) {
 
@@ -90,7 +90,7 @@ public class ConfigOperationRS {
 		return Response.accepted().build();
 	}
 
-	@Path("/config")
+	@Path("config")
 	@DELETE
 	public Response delAllConfigs() {
 		int count = context.getConfigs().size();

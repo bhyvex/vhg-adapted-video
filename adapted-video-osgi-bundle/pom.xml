@@ -5,7 +5,7 @@
 	<groupId>fr.labri.progess.comet</groupId>
 	<artifactId>adapted-video-osgi-bundle</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 	<name>osgi-http-proxy</name>
 	<description>
         This project aims at routing http request to local caching proxy or remote nfv based proxy
@@ -113,9 +113,9 @@
 			<plugin>
 				<groupId>org.jolokia</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.12.0</version>
+				<version>0.13.7</version>
 				<configuration>
-					<finalName>proxy.jar</finalName>
+					<finalName>adapted-video-osgi-bundle-${project.version}-SNAPSHOT.jar</finalName>
 					<images>
 
 
@@ -138,10 +138,7 @@
 								</ports>
 
 								<cmd>
-									<shell>java -cp /maven/*:/maven/${project.build.finalName}
-										fr.labri.progess.comet.app.App --frontalHostName
-										$FRONTAL_HOSTNAME --frontalPort $FRONTAL_PORT --host 0.0.0.0
-										--port 8080</shell>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} 										fr.labri.progess.comet.app.App --frontalHostName 										$FRONTAL_HOSTNAME --frontalPort $FRONTAL_PORT --host 0.0.0.0										--port 8080</shell>
 								</cmd>
 
 							</build>

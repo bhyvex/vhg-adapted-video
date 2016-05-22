@@ -2,10 +2,18 @@ package fr.labri.progess.comet.app;
 
 import java.awt.image.Kernel;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Singleton;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.strategies.SameThreadIOStrategy;
@@ -18,8 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 
 import fr.labri.progess.comet.cron.SchedulerUtils;
+import fr.labri.progess.comet.model.Content;
+import fr.labri.progess.comet.model.ContentWrapper;
 
 public class ConfigManager {
 
@@ -43,8 +54,9 @@ public class ConfigManager {
 
 		// create and start a new instance of grizzly http server
 		// exposing the Jersey application at BASE_URI
-		HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create("http://localhost:8888/"), rc, false);
 
+		HttpServer server = GrizzlyHttpServerFactory.createHttpServer(URI.create("http://localhost:8888/"), rc, false);
+		LOGGER.info("DEBUG API STARTED ON PORT 8888");
 		ThreadPoolConfig poolConfig = ThreadPoolConfig.defaultConfig();
 		poolConfig.setMaxPoolSize(1);
 		poolConfig.setDaemon(false);
@@ -63,7 +75,28 @@ public class ConfigManager {
 
 		server.getListener("grizzly").getTransport().setIOStrategy(SameThreadIOStrategy.getInstance());
 		server.getListener("grizzly").getTransport().setSelectorRunnersCount(1);
-		
+
+		// examples
+		Content content = new Content();
+		content.setCached(true);
+		content.setCreated(new Date());
+		content.setId(UUID.randomUUID().toString());
+
+		content.setQualities(Arrays.asList("high", "low"));
+		content.setUri("http://google.fr");
+		content.setTargetUri("http://bing.fr");
+
+		StringWriter strWriter = new StringWriter();
+		try {
+			JAXBContext.newInstance(ContentWrapper.class, Content.class).createMarshaller()
+					.marshal(ContentWrapper.wraps(Arrays.asList(content)), strWriter);
+		} catch (JAXBException e1) {
+
+			e1.printStackTrace();
+			throw Throwables.propagate(e1);
+		}
+
+		LOGGER.info("a content looks like this: {}", strWriter.getBuffer().toString());
 
 		try {
 			server.start();

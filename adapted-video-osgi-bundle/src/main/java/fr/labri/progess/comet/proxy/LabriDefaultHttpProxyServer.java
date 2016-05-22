@@ -34,6 +34,8 @@ import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 	private final class LabriHttpFilterSource implements HttpFiltersSource {
@@ -145,15 +147,26 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 					HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1,
 							HttpResponseStatus.TEMPORARY_REDIRECT);
-					Collections.shuffle(c.getQualities());
 
-					String redirectUri = UriBuilder
-							.fromPath("http://" + config.getFrontalHostName() + ":" + config.getFrontalPort())
+					if (Strings.isNullOrEmpty(c.getTargetUri())) {
+						Collections.shuffle(c.getQualities());
 
-							.path("api").path("content").path(c.getId()).path(c.getQualities().get(0)).build()
-							.toString();
-					response.headers().add("Location", redirectUri);
-					LOGGER.debug("Redirecting it to ", redirectUri);
+						String redirectUri = UriBuilder
+								.fromPath("http://" + config.getFrontalHostName() + ":" + config.getFrontalPort())
+
+								.path("api").path("content").path(c.getId()).path(c.getQualities().get(0)).build()
+								.toString();
+						response.headers().add("Location", redirectUri);
+						LOGGER.debug("Redirecting it to ", redirectUri);
+
+					}
+					else{
+						response.headers().add("Location", c.getTargetUri());
+						LOGGER.debug("Redirecting it to ", c.getTargetUri());
+					}
+
+					
+					
 					return response;
 				} else {
 					if (checkForRequestFilters(fullreq.headers())) {
